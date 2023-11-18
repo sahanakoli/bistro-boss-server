@@ -31,10 +31,34 @@ async function run() {
     const userCollection = client.db('bistroDb').collection('users');
     const menuCollection = client.db('bistroDb').collection('menu');
     const cartCollection = client.db('bistroDb').collection('carts');
-    
+   
+    // middlewares
+    const verifyToken = (req, res, next) =>{
+      console.log('inside verify token', req.headers.authorization);
+      if(!req.headers.authorization) {
+        return res.status(401).send({ message: 'forbidden access'});
+      }
+      const token = req.headers.authorization.split(' ')[1];
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) =>{
+        if(err){
+          return res.status(401).send({message: 'forbidden access'})
+        }
+        req.decoded = decoded;
+        next();
+      })
+      // next();
+    }
+
+
+    // jwt related api
+    app.post('/jwt', async(req, res) =>{
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'});
+      res.send({token});
+    })
 
     // user related api
-    app.post('/users', async(req, res) => {
+    app.post('/users', verifyToken, async(req, res) => {
       const user = req.body;
       const query = { email: user.email}
       const existingUser = await userCollection.findOne(query);
