@@ -57,7 +57,8 @@ async function run() {
           role: 'admin'
         }
       }
-      
+      const result = await userCollection.deleteOne(filter, updateDoc);
+      res.send(result);
     })
     
     app.delete('/users/:id', async(req, res) =>{
