@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 
@@ -57,7 +58,7 @@ async function run() {
           role: 'admin'
         }
       }
-      const result = await userCollection.deleteOne(filter, updateDoc);
+      const result = await userCollection.updateOne(filter, updateDoc);
       res.send(result);
     })
     
