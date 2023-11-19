@@ -3,6 +3,7 @@ const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const { Await } = require('react-router-dom');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 
@@ -122,6 +123,12 @@ async function run() {
     // menu related api
     app.get('/menu', async(req, res) =>{
       const result = await menuCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.post('/menu', verifyToken, verifyAdmin, async(req, res) => {
+      const item = req.body;
+      const result = await menuCollection.insertOne(item);
       res.send(result);
     })
 
